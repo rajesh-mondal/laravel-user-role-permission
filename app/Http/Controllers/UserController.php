@@ -23,4 +23,16 @@ class UserController extends Controller {
         return response()->json( ['message' => 'User Created Successfully'] );
     }
 
+    public function loginUser( Request $request ) {
+        $data = $request->validate( [
+            'email'    => 'required',
+            'password' => 'required',
+        ] );
+
+        if ( Auth::attempt( ['email' => $data['email'], 'password' => $data['password']] ) ) {
+            return response()->json( ['message' => 'User Login Successfully'] );
+        } else{
+            return response()->json( ['message' => 'Invalid Credencials'] );
+        }
+    }
 }
