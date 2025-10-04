@@ -71,16 +71,23 @@ class UserController extends Controller {
         return response()->json( ['message' => 'Assign Role to User Successfully'] );
     }
 
-    public function loginUser( Request $request ) {
+    public function login( Request $request ) {
         $data = $request->validate( [
             'email'    => 'required',
             'password' => 'required',
         ] );
 
         if ( Auth::attempt( ['email' => $data['email'], 'password' => $data['password']] ) ) {
-            return response()->json( ['message' => 'User Login Successfully'] );
+            $user = User::find( Auth::id() );
+            $user->load( 'roles', 'permissions' );
+            return response()->json( [
+                'user'        => $user,
+                'roles'       => $user->roles->pluck( 'name' ),
+                'permissions' => $user->allPermissions()->pluck( 'name' ),
+            ] );
         } else {
-            return response()->json( ['message' => 'Invalid Credencials'] );
+            return response()->json( ['message' => 'Invalid User'] );
         }
+
     }
 }
